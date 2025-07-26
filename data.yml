@@ -1,0 +1,1356 @@
+facilities:
+  replicator:
+    Mecha: 1
+  smelter:
+    Arc Smelter: 1
+    Plane Smelter: 2
+  assembler:
+    Assembling Machine Mk. I: 0.75
+    Assembling Machine Mk. II: 1
+    Assembling Machine Mk. III: 1.5
+  refinery:
+    Oil Refinery: 1
+  chemical:
+    Chemical Plant: 1
+    Quantum Chemical Plant: 2
+  science:
+    Matrix Lab: 1
+  particle:
+    Miniature Particle Collider: 1
+  energy:
+    Energy Exchanger: 1
+  fractionator:
+    Fractionator: 1
+  mine:
+    Mining Machine: 1
+    Advanced Mining Machine: 2
+  pump:
+    Water Pump: 1
+  extractor:
+    Oil Extractor: 1
+  collector:
+    Orbital Collector: 1
+  ray:
+    Ray Receiver: 1
+
+processes:
+
+  - makes:
+      Iron Ore: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Copper Ore: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Stone: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Coal: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Silicon Ore: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Titanium Ore: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Water: 1
+    time: 1.2
+    facility: [ pump ]
+
+  - makes:
+      Sulfuric Acid: 1
+    time: 1.2
+    facility: [ pump ]
+
+  - makes:
+      Crude Oil: 1
+    time: 1
+    facility: [ extractor ]
+
+  - makes:
+      Hydrogen: 1
+    time: 1
+    facility: [ collector ]
+
+  - makes:
+      Deuterium: 1
+    time: 1
+    facility: [ collector ]
+
+  - makes:
+      Critical Photon: 1
+    time: 1
+    facility: [ ray ]
+
+  - makes:
+      Kimberlite Ore: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Fractal Silicon: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Grating Crystal: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Stalagmite Crystal: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Unipolar Magnet: 1
+    time: 2
+    facility: [ mine ]
+
+  - makes:
+      Fire Ice: 1
+    time: 2
+    facility: [ mine, collector ]
+
+  - makes:
+      Iron Ingot: 1
+    consumes:
+      Iron Ore: 1
+    time: 1
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Copper Ingot: 1
+    consumes:
+      Copper Ore: 1
+    time: 1
+    facility: [ smelter, replicator ]
+
+  - makes:
+      High-Purity Silicon: 1
+    consumes:
+      Silicon Ore: 2
+    time: 2
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Titanium Ingot: 1
+    consumes:
+      Titanium Ore: 2
+    time: 2
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Stone Brick: 1
+    consumes:
+      Stone: 1
+    time: 1
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Energetic Graphite: 1
+    consumes:
+      Coal: 2
+    time: 2
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Energetic Graphite: 1
+      Hydrogen: 3
+    consumes:
+      Refined Oil: 1
+      Hydrogen: 2
+    time: 4
+    facility: [ refinery ]
+    special: true
+
+  - makes:
+      Hydrogen: 1
+      Refined Oil: 2
+    consumes:
+      Crude Oil: 2
+    time: 4
+    facility: [ refinery ]
+
+  - makes:
+      Graphene: 2
+    consumes:
+      Energetic Graphite: 3
+      Sulfuric Acid: 1
+    time: 3
+    facility: [ chemical ]
+
+  - makes:
+      Graphene: 2
+      Hydrogen: 1
+    consumes:
+      Fire Ice: 2
+    time: 2
+    facility: [ chemical ]
+    special: true
+
+  - makes:
+      Plastic: 1
+    consumes:
+      Refined Oil: 2
+      Energetic Graphite: 1
+    time: 3
+    facility: [ chemical ]
+
+  - makes:
+      Proliferator Mk. I: 1
+    consumes:
+      Coal: 1
+    time: 0.5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Proliferator Mk. II: 1
+    consumes:
+      Proliferator Mk. I: 2
+      Diamond: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Proliferator Mk. III: 1
+    consumes:
+      Proliferator Mk. II: 2
+      Carbon Nanotube: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Missile Set: 1
+    consumes:
+      Copper Ingot: 6
+      Circuit Board: 3
+      Combustible Unit: 2
+      Engine: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Magnet: 1
+    consumes:
+      Iron Ore: 1
+    time: 1.5
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Magnetic Coil: 2
+    consumes:
+      Magnet: 2
+      Copper Ingot: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Crystal Silicon: 1
+    consumes:
+      High-Purity Silicon: 1
+    time: 2
+    facility: [ smelter ]
+
+  - makes:
+      Crystal Silicon: 2
+    consumes:
+      Fractal Silicon: 1
+    time: 1.5
+    facility: [ assembler ]
+    special: true
+
+  - makes:
+      Titanium Alloy: 4
+    consumes:
+      Titanium Ingot: 4
+      Steel: 4
+      Sulfuric Acid: 8
+    time: 12
+    facility: [ smelter ]
+
+  - makes:
+      Glass: 1
+    consumes:
+      Stone: 2
+    time: 2
+    facility: [ smelter, replicator ]
+
+  - makes:
+      Diamond: 1
+    consumes:
+      Energetic Graphite: 1
+    time: 2
+    facility: [ smelter ]
+
+  - makes:
+      Diamond: 2
+    consumes:
+      Kimberlite Ore: 1
+    time: 1.5
+    facility: [ smelter ]
+    special: true
+
+  - makes:
+      Hydrogen: 3
+      Energetic Graphite: 1
+    consumes:
+      Refined Oil: 1
+      Hydrogen: 2
+    time: 4
+    facility: [ refinery ]
+
+  - makes:
+      Organic Crystal: 1
+    consumes:
+      Plastic: 2
+      Refined Oil: 1
+      Water: 1
+    time: 6
+    facility: [ chemical ]
+
+  - makes:
+      Combustible Unit: 1
+    consumes:
+      Coal: 3
+    time: 3
+    facility: [ chemical, replicator ]
+
+  - makes:
+      Explosive Unit: 2
+    consumes:
+      Combustible Unit: 2
+      Plastic: 2
+      Sulfuric Acid: 1
+    time: 6
+    facility: [ chemical ]
+
+  - makes:
+      Crystal Explosive Unit: 8
+    consumes:
+      Explosive Unit: 8
+      Casimir Crystal: 1
+      Crystal Silicon: 8
+    time: 24
+    facility: [ chemical ]
+
+  - makes:
+      Supersonic Missile Set: 2
+    consumes:
+      Missile Set: 2
+      Processor: 4
+      Explosive Unit: 4
+      Thruster: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Steel: 1
+    consumes:
+      Iron Ingot: 3
+    time: 3
+    facility: [ smelter ]
+
+  - makes:
+      Electric Motor: 1
+    consumes:
+      Iron Ore: 2
+      Gear: 1
+      Magnetic Coil: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Titanium Glass: 2
+    consumes:
+      Glass: 2
+      Titanium Ingot: 2
+      Water: 2
+    time: 5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Prism: 2
+    consumes:
+      Glass: 3
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Refined Oil: 3
+    consumes:
+      Refined Oil: 2
+      Hydrogen: 1
+      Coal: 1
+    time: 4
+    facility: [ refinery ]
+
+  - makes:
+      Titanium Crystal: 1
+    consumes:
+      Organic Crystal: 1
+      Titanium Ingot: 3
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Engine: 1
+    consumes:
+      Magnetic Coil: 1
+      Copper Ingot: 2
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Thruster: 1
+    consumes:
+      Steel: 2
+      Copper Ingot: 3
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Reinforced Thruster: 1
+    consumes:
+      Titanium Alloy: 5
+      Electromagnetic Turbine: 5
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Gravity Missile Set: 3
+    consumes:
+      Supersonic Missile Set: 3
+      Crystal Explosive Unit: 6
+      Strange Matter: 3
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Gear: 1
+    consumes:
+      Iron Ingot: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Electromagnetic Turbine: 1
+    consumes:
+      Electric Motor: 2
+      Magnetic Coil: 2
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Silicon Ore: 1
+    consumes:
+      Stone: 10
+    time: 10
+    facility: [ smelter ]
+
+  - makes:
+      Circuit Board: 2
+    consumes:
+      Iron Ingot: 2
+      Copper Ingot: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Graviton Lens: 1
+    consumes:
+      Diamond: 4
+      Strange Matter: 1
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Sulfuric Acid: 4
+    consumes:
+      Refined Oil: 6
+      Stone: 8
+      Water: 4
+    time: 6
+    facility: [ chemical ]
+
+  - makes:
+      Carbon Nanotube: 2
+    consumes:
+      Graphene: 3
+      Titanium Ingot: 1
+    time: 4
+    facility: [ chemical ]
+
+  - makes:
+      Carbon Nanotube: 2
+    consumes:
+      Stalagmite Crystal: 6
+    time: 4
+    facility: [ chemical ]
+    special: true
+
+  - makes:
+      Strange Matter: 1
+    consumes:
+      Particle Container: 2
+      Iron Ingot: 2
+      Deuterium: 10
+    time: 8
+    facility: [ particle ]
+
+  - makes:
+      Logistics Bot: 1
+    consumes:
+      Iron Ingot: 2
+      Engine: 1
+      Processor: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Logistics Drone: 1
+    consumes:
+      Iron Ingot: 5
+      Processor: 2
+      Thruster: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Interstellar Logistics Vessel: 1
+    consumes:
+      Titanium Alloy: 10
+      Processor: 10
+      Reinforced Thruster: 2
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Plasma Exciter: 1
+    consumes:
+      Magnetic Coil: 4
+      Prism: 2
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Super-Magnetic Ring: 1
+    consumes:
+      Electromagnetic Turbine: 2
+      Magnet: 3
+      Energetic Graphite: 1
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Particle Broadband: 1
+    consumes:
+      Carbon Nanotube: 2
+      Crystal Silicon: 2
+      Plastic: 1
+    time: 8
+    facility: [ assembler, replicator ]
+
+  - makes:
+        Processor: 1
+    consumes:
+      Circuit Board: 2
+      Microcrystalline Component: 2
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Casimir Crystal: 1
+    consumes:
+      Titanium Crystal: 1
+      Graphene: 2
+      Hydrogen: 12
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Casimir Crystal: 1
+    consumes:
+      Grating Crystal: 8
+      Graphene: 2
+      Hydrogen: 12
+    time: 4
+    facility: [ assembler, replicator ]
+    special: true
+
+  - makes:
+      Particle Container: 1
+    consumes:
+      Electromagnetic Turbine: 2
+      Copper Ingot: 2
+      Graphene: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Particle Container: 1
+    consumes:
+      Unipolar Magnet: 10
+      Copper Ingot: 2
+    time: 4
+    facility: [ assembler, replicator ]
+    special: true
+
+  - makes:
+      Deuterium: 5
+    consumes:
+      Hydrogen: 10
+    time: 2.5
+    facility: [ particle ]
+    special: true
+
+  - makes:
+      Deuterium: 1
+    consumes:
+      Hydrogen: 1
+    time: 3  # estimated
+    facility: [ fractionator ]
+
+  - makes:
+      Solar Sail: 2
+    consumes:
+      Graphene: 1
+      Photon Combiner: 1
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Frame Material: 1
+    consumes:
+      Carbon Nanotube: 4
+      Titanium Alloy: 1
+      High-Purity Silicon: 1
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Dyson Sphere Component: 1
+    consumes:
+      Frame Material: 3
+      Solar Sail: 3
+      Processor: 3
+    time: 8
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Small Carrier Rocket: 1
+    consumes:
+      Dyson Sphere Component: 2
+      Deuteron Fuel Rod: 4
+      Quantum Chip: 2
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Photon Combiner: 1
+    consumes:
+      Prism: 2
+      Circuit Board: 1
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Photon Combiner: 1
+    consumes:
+      Grating Crystal: 1
+      Circuit Board: 1
+    time: 3
+    facility: [ assembler, replicator ]
+    special: true
+
+  - makes:
+      Microcrystalline Component: 1
+    consumes:
+      High-Purity Silicon: 2
+      Copper Ingot: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Quantum Chip: 1
+    consumes:
+      Processor: 2
+      Plane Filter: 2
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Plane Filter: 1
+    consumes:
+      Casimir Crystal: 1
+      Titanium Glass: 2
+    time: 12
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Annihilation Constraint Sphere: 1
+    consumes:
+      Particle Container: 1
+      Processor: 1
+    time: 20
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Hydrogen Fuel Rod: 2
+    consumes:
+      Titanium Ingot: 1
+      Hydrogen: 10
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Deuteron Fuel Rod: 2
+    consumes:
+      Titanium Alloy: 1
+      Deuterium: 20
+      Super-Magnetic Ring: 1
+    time: 12
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Antimatter Fuel Rod: 2
+    consumes:
+      Antimatter: 12
+      Hydrogen: 12
+      Annihilation Constraint Sphere: 1
+      Titanium Alloy: 1
+    time: 24
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Foundation: 1
+    consumes:
+      Stone Brick: 3
+      Steel: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Prototype: 1
+    consumes:
+      Iron Ingot: 3
+      Engine: 1
+      Circuit Board: 2
+      Plasma Exciter: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Precision Drone: 1
+    consumes:
+      Prototype: 1
+      Electromagnetic Turbine: 1
+      Circuit Board: 2
+      Photon Combiner: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Attack Drone: 1
+    consumes:
+      Prototype: 1
+      Electromagnetic Turbine: 1
+      Processor: 1
+      Particle Container: 1
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Corvette: 1
+    consumes:
+      Titanium Alloy: 5
+      Reinforced Thruster: 1
+      Processor: 2
+      Particle Container: 3
+    time: 5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Destroyer: 1
+    consumes:
+      Frame Material: 20
+      Reinforced Thruster: 4
+      Processor: 4
+      Strange Matter: 1
+    time: 8
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Space Warper: 1
+    consumes:
+      Graviton Lens: 1
+    time: 10
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Space Warper: 8
+    consumes:
+      Gravity Matrix: 1
+    time: 10
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Antimatter: 2
+      Hydrogen: 2
+    consumes:
+      Critical Photon: 2
+    time: 2
+    facility: [ particle ]
+
+  - makes:
+      Electromagnetic Matrix: 1
+    consumes:
+      Magnetic Coil: 1
+      Circuit Board: 1
+    time: 3
+    facility: [ science ]
+
+  - makes:
+      Energy Matrix: 1
+    consumes:
+      Energetic Graphite: 2
+      Hydrogen: 2
+    time: 6
+    facility: [ science ]
+
+  - makes:
+      Structure Matrix: 1
+    consumes:
+      Diamond: 1
+      Titanium Crystal: 1
+    time: 8
+    facility: [ science ]
+
+  - makes:
+      Information Matrix: 1
+    consumes:
+      Processor: 2
+      Particle Broadband: 1
+    time: 10
+    facility: [ science ]
+
+  - makes:
+      Gravity Matrix: 2
+    consumes:
+      Graviton Lens: 1
+      Quantum Chip: 1
+    time: 24
+    facility: [ science ]
+
+  - makes:
+      Universe Matrix: 1
+    consumes:
+      Electromagnetic Matrix: 1
+      Energy Matrix: 1
+      Structure Matrix: 1
+      Information Matrix: 1
+      Gravity Matrix: 1
+      Antimatter: 1
+    time: 15
+    facility: [ science ]
+
+  - makes:
+      Tesla Tower: 1
+    consumes:
+      Iron Ingot: 2
+      Magnetic Coil: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Wireless Power Tower: 1
+    consumes:
+      Tesla Tower: 1
+      Plasma Exciter: 3
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Satellite Substation: 1
+    consumes:
+      Wireless Power Tower: 1
+      Super-Magnetic Ring: 10
+      Frame Material: 2
+    time: 5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Wind Turbine: 1
+    consumes:
+      Iron Ingot: 6
+      Gear: 1
+      Magnetic Coil: 3
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Thermal Power Plant: 1
+    consumes:
+      Iron Ingot: 10
+      Stone Brick: 4
+      Gear: 4
+      Magnetic Coil: 4
+    time: 5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Solar Panel: 1
+    consumes:
+      Copper Ingot: 10
+      High-Purity Silicon: 10
+      Circuit Board: 5
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Accumulator: 1
+    consumes:
+      Iron Ingot: 6
+      Super-Magnetic Ring: 1
+      Crystal Silicon: 3
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Charged Accumulator: 1
+    consumes:
+      Accumulator: 1
+    time: 30  # estimated
+    facility: [ energy ]
+
+  - makes:
+      Geothermal Power Station: 1
+    consumes:
+      Steel: 15
+      Copper Ingot: 20
+      Photon Combiner: 4
+      Super-Magnetic Ring: 1
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Mini Fusion Power Plant: 1
+    consumes:
+      Titanium Alloy: 12
+      Super-Magnetic Ring: 10
+      Carbon Nanotube: 8
+      Processor: 4
+    time: 10
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Energy Exchanger: 1
+    consumes:
+      Titanium Alloy: 40
+      Steel: 40
+      Processor: 40
+      Strange Matter: 8
+    time: 15
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Ray Receiver: 1
+    consumes:
+      Steel: 20
+      High-Purity Silicon: 20
+      Photon Combiner: 10
+      Processor: 5
+      Super-Magnetic Ring: 20
+    time: 8
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Artificial Star: 1
+    consumes:
+      Titanium Alloy: 20
+      Frame Material: 20
+      Annihilation Constraint Sphere: 10
+      Quantum Chip: 10
+    time: 30
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Conveyor Belt Mk. I: 3
+    consumes:
+      Iron Ingot: 2
+      Gear: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Conveyor Belt Mk. II: 3
+    consumes:
+      Conveyor Belt Mk. I: 3
+      Electromagnetic Turbine: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Conveyor Belt Mk. III: 3
+    consumes:
+      Conveyor Belt Mk. II: 3
+      Super-Magnetic Ring: 1
+      Graphene: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Splitter: 1
+    consumes:
+      Iron Ingot: 3
+      Gear: 2
+      Circuit Board: 1
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Automatic Piler: 1
+    consumes:
+      Steel: 3
+      Gear: 4
+      Super-Magnetic Ring: 1
+      Processor: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Traffic Monitor: 1
+    consumes:
+      Iron Ingot: 3
+      Gear: 2
+      Glass: 1
+      Circuit Board: 2
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Spray Coater: 1
+    consumes:
+      Steel: 4
+      Plasma Exciter: 2
+      Circuit Board: 2
+      Microcrystalline Component: 2
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Depot Mk. I: 1
+    consumes:
+      Iron Ingot: 4
+      Stone Brick: 4
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Depot Mk. II: 1
+    consumes:
+      Steel: 8
+      Stone Brick: 8
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Storage Tank: 1
+    consumes:
+      Iron Ingot: 8
+      Stone Brick: 4
+      Glass: 4
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Logistics Distributor: 1
+    consumes:
+      Iron Ingot: 8
+      Plasma Exciter: 4
+      Processor: 4
+    time: 8
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Planetary Logistics Station: 1
+    consumes:
+      Steel: 40
+      Titanium Ingot: 40
+      Processor: 40
+      Particle Container: 20
+    time: 20
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Interstellar Logistics Station: 1
+    consumes:
+      Planetary Logistics Station: 1
+      Titanium Alloy: 40
+      Particle Container: 20
+    time: 30
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Orbital Collector: 1
+    consumes:
+      Interstellar Logistics Station: 1
+      Super-Magnetic Ring: 50
+      Reinforced Thruster: 20
+      Charged Accumulator: 20
+    time:
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Sorter Mk. I: 1
+    consumes:
+      Iron Ingot: 1
+      Circuit Board: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Sorter Mk. II: 2
+    consumes:
+      Sorter Mk. I: 2
+      Electric Motor: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Sorter Mk. III: 2
+    consumes:
+      Sorter Mk. II: 2
+      Electromagnetic Turbine: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Pile Sorter: 1
+    consumes:
+      Sorter Mk. III: 2
+      Super-Magnetic Ring: 1
+      Processor: 1
+    time: 1
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Mining Machine: 1
+    consumes:
+      Iron Ingot: 4
+      Circuit Board: 2
+      Magnetic Coil: 2
+      Gear: 2
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Advanced Mining Machine: 1
+    consumes:
+      Titanium Alloy: 20
+      Frame Material: 10
+      Super-Magnetic Ring: 10
+      Quantum Chip: 4
+      Grating Crystal: 40
+    time: 20
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Water Pump: 1
+    consumes:
+      Iron Ingot: 8
+      Stone Brick: 4
+      Electromagnetic Turbine: 4
+      Circuit Board: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Oil Extractor: 1
+    consumes:
+      Steel: 12
+      Stone Brick: 12
+      Circuit Board: 6
+      Plasma Exciter: 4
+    time: 8
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Oil Refinery: 1
+    consumes:
+      Steel: 10
+      Stone Brick: 10
+      Circuit Board: 6
+      Plasma Exciter: 6
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Fractionator: 1
+    consumes:
+      Steel: 8
+      Stone Brick: 4
+      Glass: 4
+      Processor: 1
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Chemical Plant: 1
+    consumes:
+      Steel: 8
+      Stone Brick: 8
+      Glass: 8
+      Circuit Board: 2
+    time: 5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Quantum Chemical Plant: 1
+    consumes:
+      Chemical Plant: 1
+      Titanium Glass: 10
+      Strange Matter: 3
+      Quantum Chip: 3
+    time: 10
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Miniature Particle Collider: 1
+    consumes:
+      Titanium Alloy: 20
+      Frame Material: 20
+      Super-Magnetic Ring: 25
+      Graphene: 10
+      Processor: 8
+    time: 15
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Arc Smelter: 1
+    consumes:
+      Iron Ingot: 4
+      Stone Brick: 2
+      Circuit Board: 4
+      Magnetic Coil: 2
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Plane Smelter: 1
+    consumes:
+      Arc Smelter: 1
+      Frame Material: 5
+      Plane Filter: 4
+      Unipolar Magnet: 15
+    time: 5
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Assembling Machine Mk. I: 1
+    consumes:
+      Iron Ingot: 4
+      Gear: 8
+      Circuit Board: 4
+    time: 2
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Assembling Machine Mk. II: 1
+    consumes:
+      Assembling Machine Mk. I: 1
+      Graphene: 8
+      Processor: 4
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Assembling Machine Mk. III: 1
+    consumes:
+      Assembling Machine Mk. II: 1
+      Particle Broadband: 8
+      Quantum Chip: 2
+    time: 4
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Matrix Lab: 1
+    consumes:
+      Iron Ingot: 8
+      Glass: 4
+      Circuit Board: 4
+      Magnetic Coil: 4
+    time: 3
+    facility: [ assembler, replicator ]
+
+  - makes:
+      EM-Rail Ejector: 1
+    consumes:
+      Steel: 20
+      Gear: 20
+      Processor: 5
+      Super-Magnetic Ring: 10
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Vertical Launching Silo: 1
+    consumes:
+      Titanium Alloy: 80
+      Frame Material: 30
+      Graviton Lens: 20
+      Quantum Chip: 10
+    time: 30
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Missile Turret: 1
+    consumes:
+      Steel: 8
+      Electric Motor: 6
+      Circuit Board: 12
+      Engine: 6
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Battlefield Analysis Base: 1
+    consumes:
+      Steel: 12
+      Circuit Board: 18
+      Microcrystalline Component: 6
+      Engine: 12
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Signal Tower: 1
+    consumes:
+      Wireless Power Tower: 2
+      Steel: 12
+      Crystal Silicon: 6
+    time: 6
+    facility: [ assembler, replicator ]
+
+  - makes:
+      Planetary Shield Generator: 1
+    consumes:
+      Steel: 20
+      Electromagnetic Turbine: 20
+      Super-Magnetic Ring: 5
+      Particle Container: 5
+    time: 10
+    facility: [ assembler, replicator ]
