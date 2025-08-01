@@ -11,6 +11,10 @@ import (
 //go:embed data.yml
 var dataFileContent []byte
 
+var gitCommit string
+
+const gitRepo = "https://github.com/ghjm/dyson"
+
 func main() {
 	rootCmd := &cobra.Command{
 		Use:          "dyson",
@@ -170,6 +174,21 @@ func main() {
 		},
 	}
 	rootCmd.AddCommand(resourcesCmd)
+
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Shows the git commit this was built from",
+		Run: func(cmd *cobra.Command, args []string) {
+			if gitCommit == "" {
+				fmt.Printf("This is a development build with no version information.\n")
+			} else {
+				fmt.Printf("This program is unversioned, but this copy was built from:\n")
+				fmt.Printf("%s/commit/%s\n", gitRepo, gitCommit)
+			}
+			fmt.Printf("\n")
+		},
+	}
+	rootCmd.AddCommand(versionCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
