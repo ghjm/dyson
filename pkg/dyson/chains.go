@@ -2,6 +2,8 @@ package dyson
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -37,7 +39,7 @@ func (pc *ProductionChain) fillOneChain(n int) error {
 		if !proc.Special {
 			found = true
 			ps.Process = &proc
-			for con := range proc.Consumes {
+			for _, con := range slices.Sorted(maps.Keys(proc.Consumes)) {
 				alreadyHave := false
 				for _, s := range pc.Steps {
 					if s.Target == con {
@@ -99,7 +101,7 @@ func (pc *ProductionChain) GetAllProducibleExcluding(exclusions []string) error 
 				continue
 			}
 			exc := false
-			for m := range proc.Makes {
+			for _, m := range slices.Sorted(maps.Keys(proc.Makes)) {
 				if _, ok := excluded[m]; ok {
 					exc = true
 					break
@@ -109,7 +111,7 @@ func (pc *ProductionChain) GetAllProducibleExcluding(exclusions []string) error 
 				continue
 			}
 			needed := false
-			for m := range proc.Makes {
+			for _, m := range slices.Sorted(maps.Keys(proc.Makes)) {
 				if _, ok := have[m]; !ok {
 					needed = true
 					break
@@ -119,7 +121,7 @@ func (pc *ProductionChain) GetAllProducibleExcluding(exclusions []string) error 
 				continue
 			}
 			makeable := true
-			for p := range proc.Consumes {
+			for _, p := range slices.Sorted(maps.Keys(proc.Consumes)) {
 				if _, ok := have[p]; !ok {
 					makeable = false
 					break
@@ -127,7 +129,7 @@ func (pc *ProductionChain) GetAllProducibleExcluding(exclusions []string) error 
 			}
 			if makeable {
 				foundAny = true
-				for t := range proc.Makes {
+				for _, t := range slices.Sorted(maps.Keys(proc.Makes)) {
 					have[t] = struct{}{}
 					pc.Steps = append(pc.Steps, ProductionStep{
 						Target:  t,
@@ -159,7 +161,7 @@ func (ps *ProductionStep) String() string {
 		sb.WriteString("<unknown>")
 	} else {
 		var reqs []string
-		for r := range ps.Process.Consumes {
+		for _, r := range slices.Sorted(maps.Keys(ps.Process.Consumes)) {
 			reqs = append(reqs, r)
 		}
 		if len(reqs) > 0 {
