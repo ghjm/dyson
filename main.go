@@ -78,7 +78,7 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
 			}
-			fmt.Printf(ch.String())
+			fmt.Printf("%s", ch.String())
 			return nil
 		},
 	}
@@ -101,7 +101,7 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
 			}
-			fmt.Printf(ch.String())
+			fmt.Printf("%s", ch.String())
 			return nil
 		},
 	}

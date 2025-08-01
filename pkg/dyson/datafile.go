@@ -2,7 +2,7 @@ package dyson
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 type DataFile struct {
