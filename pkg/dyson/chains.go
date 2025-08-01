@@ -160,10 +160,7 @@ func (ps *ProductionStep) String() string {
 	if ps.Process == nil {
 		sb.WriteString("<unknown>")
 	} else {
-		var reqs []string
-		for _, r := range slices.Sorted(maps.Keys(ps.Process.Consumes)) {
-			reqs = append(reqs, r)
-		}
+		reqs := slices.Sorted(maps.Keys(ps.Process.Consumes))
 		if len(reqs) > 0 {
 			sb.WriteString(strings.Join(reqs, ", "))
 		} else {
