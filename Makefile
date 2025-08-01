@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 VERSION_FLAGS := $(shell git rev-parse HEAD)
 ifneq ($(VERSION_FLAGS),)
 	VERSION_FLAGS := -ldflags=\"-X 'main.gitCommit=$(VERSION_FLAGS)'\"
