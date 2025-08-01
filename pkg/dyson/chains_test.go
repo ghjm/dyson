@@ -404,3 +404,173 @@ func TestProductionChain_EdgeCases(t *testing.T) {
 		t.Errorf("String() should return empty string for empty chain, got: %q", str)
 	}
 }
+
+func TestProductionChain_FillChain_StableOrder(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test that FillChain produces stable ordering across multiple runs
+	const numRuns = 10
+	var results [][]string
+
+	for i := 0; i < numRuns; i++ {
+		pc := df.NewChain([]string{"Circuit Board"})
+		err := pc.FillChain()
+		if err != nil {
+			t.Fatalf("FillChain() run %d failed: %v", i, err)
+		}
+
+		// Extract the targets in order
+		targets := make([]string, len(pc.Steps))
+		for j, step := range pc.Steps {
+			targets[j] = step.Target
+		}
+		results = append(results, targets)
+	}
+
+	// Verify all runs produced the same order
+	firstResult := results[0]
+	for i := 1; i < numRuns; i++ {
+		if len(results[i]) != len(firstResult) {
+			t.Errorf("Run %d produced %d steps, expected %d", i, len(results[i]), len(firstResult))
+			continue
+		}
+
+		for j := 0; j < len(firstResult); j++ {
+			if results[i][j] != firstResult[j] {
+				t.Errorf("Run %d step %d: got %q, expected %q", i, j, results[i][j], firstResult[j])
+				t.Errorf("Run %d order: %v", i, results[i])
+				t.Errorf("Expected order: %v", firstResult)
+				break
+			}
+		}
+	}
+
+	t.Logf("FillChain stable order verified across %d runs with %d steps", numRuns, len(firstResult))
+}
+
+func TestProductionChain_GetAllProducible_StableOrder(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test that GetAllProducible produces stable ordering across multiple runs
+	const numRuns = 10
+	var results [][]string
+
+	for i := 0; i < numRuns; i++ {
+		pc := df.NewChain([]string{"Iron Ore", "Copper Ore"})
+		err := pc.GetAllProducible()
+		if err != nil {
+			t.Fatalf("GetAllProducible() run %d failed: %v", i, err)
+		}
+
+		// Extract the targets in order
+		targets := make([]string, len(pc.Steps))
+		for j, step := range pc.Steps {
+			targets[j] = step.Target
+		}
+		results = append(results, targets)
+	}
+
+	// Verify all runs produced the same order
+	firstResult := results[0]
+	for i := 1; i < numRuns; i++ {
+		if len(results[i]) != len(firstResult) {
+			t.Errorf("Run %d produced %d steps, expected %d", i, len(results[i]), len(firstResult))
+			continue
+		}
+
+		for j := 0; j < len(firstResult); j++ {
+			if results[i][j] != firstResult[j] {
+				t.Errorf("Run %d step %d: got %q, expected %q", i, j, results[i][j], firstResult[j])
+				t.Errorf("Run %d order: %v", i, results[i])
+				t.Errorf("Expected order: %v", firstResult)
+				break
+			}
+		}
+	}
+
+	t.Logf("GetAllProducible stable order verified across %d runs with %d steps", numRuns, len(firstResult))
+}
+
+func TestProductionChain_GetAllProducibleExcluding_StableOrder(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test that GetAllProducibleExcluding produces stable ordering across multiple runs
+	const numRuns = 10
+	var results [][]string
+	exclusions := []string{"Gear"}
+
+	for i := 0; i < numRuns; i++ {
+		pc := df.NewChain([]string{"Iron Ore", "Copper Ore"})
+		err := pc.GetAllProducibleExcluding(exclusions)
+		if err != nil {
+			t.Fatalf("GetAllProducibleExcluding() run %d failed: %v", i, err)
+		}
+
+		// Extract the targets in order
+		targets := make([]string, len(pc.Steps))
+		for j, step := range pc.Steps {
+			targets[j] = step.Target
+		}
+		results = append(results, targets)
+	}
+
+	// Verify all runs produced the same order
+	firstResult := results[0]
+	for i := 1; i < numRuns; i++ {
+		if len(results[i]) != len(firstResult) {
+			t.Errorf("Run %d produced %d steps, expected %d", i, len(results[i]), len(firstResult))
+			continue
+		}
+
+		for j := 0; j < len(firstResult); j++ {
+			if results[i][j] != firstResult[j] {
+				t.Errorf("Run %d step %d: got %q, expected %q", i, j, results[i][j], firstResult[j])
+				t.Errorf("Run %d order: %v", i, results[i])
+				t.Errorf("Expected order: %v", firstResult)
+				break
+			}
+		}
+	}
+
+	// Verify exclusions are respected
+	for _, step := range firstResult {
+		for _, excluded := range exclusions {
+			if step == excluded {
+				t.Errorf("GetAllProducibleExcluding() included excluded item: %s", excluded)
+			}
+		}
+	}
+
+	t.Logf("GetAllProducibleExcluding stable order verified across %d runs with %d steps", numRuns, len(firstResult))
+}
+
+func TestProductionChain_StringOutput_StableOrder(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test that String() output is stable across multiple runs
+	const numRuns = 5
+	var results []string
+
+	for i := 0; i < numRuns; i++ {
+		pc := df.NewChain([]string{"Circuit Board"})
+		err := pc.FillChain()
+		if err != nil {
+			t.Fatalf("FillChain() run %d failed: %v", i, err)
+		}
+
+		str := pc.String()
+		results = append(results, str)
+	}
+
+	// Verify all runs produced the same string output
+	firstResult := results[0]
+	for i := 1; i < numRuns; i++ {
+		if results[i] != firstResult {
+			t.Errorf("Run %d produced different string output", i)
+			t.Errorf("Run %d output:\n%s", i, results[i])
+			t.Errorf("Expected output:\n%s", firstResult)
+		}
+	}
+
+	t.Logf("String output stable across %d runs", numRuns)
+}
