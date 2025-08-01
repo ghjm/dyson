@@ -20,6 +20,8 @@ bin:
 	    ARCH=$${PATH_PARTS[1]}
 	    if [ "$$OS" == "windows" ]; then
 	        SUFFIX=".exe"
+	    else
+	        SUFFIX=""
 	    fi
 	    GOOS=$$OS GOARCH=$$ARCH go build -o bin/dyson-$$OS-$$ARCH$$SUFFIX $$VERSION_FLAGS main.go
 	done
