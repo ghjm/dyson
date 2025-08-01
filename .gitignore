@@ -1,3 +1,6 @@
 /dyson
 /.idea/
+/.vscode/
 /bin/
+*.swp
+*~
