@@ -1,30 +1,43 @@
+PROGRAM := dyson
+PLATFORMS := linux/amd64 linux/arm64 windows/amd64 windows/arm64 darwin/amd64 darwin/arm64
+PROGRAM_DEPS := Makefile data.yml go.mod go.sum main.go $(call go_deps,main.go)
 SHELL := /bin/bash
 
+# Get commit hash from git
 VERSION_FLAGS := $(shell git rev-parse HEAD)
 ifneq ($(VERSION_FLAGS),)
 	VERSION_FLAGS := -ldflags="-X 'main.gitCommit=$(VERSION_FLAGS)'"
 endif
 
-PLATFORMS := linux/amd64 linux/arm64 windows/amd64 windows/arm64 darwin/amd64 darwin/arm64
+# go_deps calculates the Go dependencies required to compile a given source file
+define go_deps
+$(shell find $(shell go list -f '{{.Dir}}' -deps $(1) | grep "^$$PWD") -name '*.go' | grep -v '_test.go$$' | grep -v '_gen.go$$')
+endef
 
-dyson: main.go $(shell find pkg/dyson -type f -name '*.go')
-	go build -o dyson $$VERSION_FLAGS main.go
+# binary_path calculates the bin path for a given platform
+define binary_path
+$(if $(findstring windows,$(1)),bin/$(PROGRAM)-$(subst /,-,$(1)).exe,bin/$(PROGRAM)-$(subst /,-,$(1)))
+endef
+
+BINARIES := $(foreach plat,$(PLATFORMS),$(call binary_path,$(plat)))
+
+$(PROGRAM): $(PROGRAM_DEPS)
+	go build -o $(PROGRAM) $(VERSION_FLAGS) main.go
 
 .PHONY: bin
-.ONESHELL:
-bin:
-	@for PLAT in $(PLATFORMS); do
-	    echo Building $$PLAT...
-	    IFS='/' read -ra PATH_PARTS <<< $$PLAT
-	    OS=$${PATH_PARTS[0]}
-	    ARCH=$${PATH_PARTS[1]}
-	    if [ "$$OS" == "windows" ]; then
-	        SUFFIX=".exe"
-	    else
-	        SUFFIX=""
-	    fi
-	    GOOS=$$OS GOARCH=$$ARCH go build -o bin/dyson-$$OS-$$ARCH$$SUFFIX $(VERSION_FLAGS) main.go
-	done
+bin: $(BINARIES)
+
+bin/$(PROGRAM)-%: $(PROGRAM_DEPS)
+	@echo "Building bin/$(PROGRAM)-$*"
+	@base=$* ; \
+	[[ "$$base" == *.exe ]] && base=$${base%.exe} ; \
+	GOOS=$$(echo $$base | cut -d- -f1) ; \
+	GOARCH=$$(echo $$base | cut -d- -f2) ; \
+	GOOS=$$GOOS GOARCH=$$GOARCH \
+	go build -o $@ $(VERSION_FLAGS) main.go
+
+.PHONY: all
+all: $(PROGRAM) bin
 
 .PHONY: lint
 lint:
@@ -44,6 +57,6 @@ check-fmt:
 
 .PHONY: clean
 clean:
-	rm -f dyson
+	rm -f $(PROGRAM)
 	rm -rf bin
 
