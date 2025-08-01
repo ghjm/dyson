@@ -26,7 +26,7 @@ bin:
 
 .PHONY: test
 test:
-	go test ./... -count=1a
+	go test ./... -count=1
 
 .PHONY: fmt
 fmt:
