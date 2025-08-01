@@ -26,13 +26,17 @@ bin:
 	    GOOS=$$OS GOARCH=$$ARCH go build -o bin/dyson-$$OS-$$ARCH$$SUFFIX $$VERSION_FLAGS main.go
 	done
 
+.PHONY: lint
+lint:
+	@golangci-lint run
+
 .PHONY: test
 test:
-	go test ./... -count=1
+	@go test ./... -count=1
 
 .PHONY: fmt
 fmt:
-	go fmt ./...
+	@go fmt ./...
 
 .PHONY: check-fmt
 check-fmt:

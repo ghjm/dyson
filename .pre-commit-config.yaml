@@ -9,4 +9,9 @@ repos:
       language: system
       pass_filenames: false
       always_run: true
-    
+    - id: lint
+      name: Run linters
+      entry: make lint
+      language: system
+      pass_filenames: false
+      always_run: true
