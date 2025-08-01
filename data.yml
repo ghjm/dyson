@@ -1173,7 +1173,7 @@ processes:
     consumes:
       Iron Ingot: 8
       Stone Brick: 4
-      Electromagnetic Turbine: 4
+      Electric Motor: 4
       Circuit Board: 2
     time: 4
     facility: [ assembler, replicator ]
