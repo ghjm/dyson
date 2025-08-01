@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 VERSION_FLAGS := $(shell git rev-parse HEAD)
 ifneq ($(VERSION_FLAGS),)
-	VERSION_FLAGS := -ldflags=\"-X 'main.gitCommit=$(VERSION_FLAGS)'\"
+	VERSION_FLAGS := -ldflags="-X 'main.gitCommit=$(VERSION_FLAGS)'"
 endif
 
 PLATFORMS := linux/amd64 linux/arm64 windows/amd64 windows/arm64 darwin/amd64 darwin/arm64
@@ -23,7 +23,7 @@ bin:
 	    else
 	        SUFFIX=""
 	    fi
-	    GOOS=$$OS GOARCH=$$ARCH go build -o bin/dyson-$$OS-$$ARCH$$SUFFIX $$VERSION_FLAGS main.go
+	    GOOS=$$OS GOARCH=$$ARCH go build -o bin/dyson-$$OS-$$ARCH$$SUFFIX $(VERSION_FLAGS) main.go
 	done
 
 .PHONY: lint
