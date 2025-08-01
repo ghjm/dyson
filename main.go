@@ -69,11 +69,7 @@ func main() {
 			if err != nil {
 				return err
 			}
-			var reqs []string
-			for _, r := range args {
-				reqs = append(reqs, r)
-			}
-			ch := df.NewChain(reqs)
+			ch := df.NewChain(args)
 			err = ch.FillChain()
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
@@ -92,11 +88,7 @@ func main() {
 			if err != nil {
 				return err
 			}
-			var reqs []string
-			for _, r := range args {
-				reqs = append(reqs, r)
-			}
-			ch := df.NewChain(reqs)
+			ch := df.NewChain(args)
 			err = ch.GetAllProducible()
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
@@ -120,17 +112,13 @@ func main() {
 				return err
 			}
 			var reqs []string
-			for _, r := range oldItems {
-				reqs = append(reqs, r)
-			}
+			reqs = append(reqs, oldItems...)
 			chOld := df.NewChain(reqs)
 			err = chOld.GetAllProducibleExcluding(oldExcludes)
 			if err != nil {
 				return fmt.Errorf("error filling old chain: %w", err)
 			}
-			for _, r := range newItems {
-				reqs = append(reqs, r)
-			}
+			reqs = append(reqs, newItems...)
 			chNew := df.NewChain(reqs)
 			err = chNew.GetAllProducibleExcluding(newExcludes)
 			if err != nil {
