@@ -15,6 +15,7 @@ type ProductionChain struct {
 type ProductionStep struct {
 	Target  string
 	Process *Process
+	Rate    float32
 }
 
 func (df *DataFile) NewChain(reqs []string) *ProductionChain {
@@ -29,6 +30,16 @@ func (df *DataFile) NewChain(reqs []string) *ProductionChain {
 	return pc
 }
 
+func (pc *ProductionChain) SetRate(item string, rate float32) error {
+	for i := range pc.Steps {
+		if pc.Steps[i].Target == item {
+			pc.Steps[i].Rate = rate
+			return nil
+		}
+	}
+	return fmt.Errorf("item not found in chain: %s", item)
+}
+
 func (pc *ProductionChain) fillOneChain(n int) error {
 	ps := &pc.Steps[n]
 	if ps.Process != nil {
@@ -39,20 +50,32 @@ func (pc *ProductionChain) fillOneChain(n int) error {
 		if !proc.Special {
 			found = true
 			ps.Process = &proc
+
+			var runsPerSecond float32
+			itemsPerRun := float32(proc.Makes[ps.Target])
+			if itemsPerRun > 0 {
+				runsPerSecond = ps.Rate / itemsPerRun
+			}
+
 			for _, con := range slices.Sorted(maps.Keys(proc.Consumes)) {
+				consumedAmount := float32(proc.Consumes[con])
+				requiredRate := runsPerSecond * consumedAmount
+
 				alreadyHave := false
-				for _, s := range pc.Steps {
-					if s.Target == con {
+				for i := range pc.Steps {
+					if pc.Steps[i].Target == con {
+						// Add to existing rate (accumulate demand from multiple consumers)
+						pc.Steps[i].Rate += requiredRate
 						alreadyHave = true
 						break
 					}
 				}
-				if alreadyHave {
-					continue
+				if !alreadyHave {
+					pc.Steps = append(pc.Steps, ProductionStep{
+						Target: con,
+						Rate:   requiredRate,
+					})
 				}
-				pc.Steps = append(pc.Steps, ProductionStep{
-					Target: con,
-				})
 			}
 			break
 		}
@@ -156,7 +179,15 @@ func (pc *ProductionChain) String() string {
 
 func (ps *ProductionStep) String() string {
 	sb := strings.Builder{}
-	sb.WriteString(fmt.Sprintf("%s: ", ps.Target))
+
+	rr := ""
+	if ps.Rate > 0 {
+		// Format without scientific notation and remove trailing zeros
+		rr = fmt.Sprintf(" (%s/s)", strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.3f", ps.Rate), "0"), "."))
+	}
+
+	sb.WriteString(fmt.Sprintf("%s%s: ", ps.Target, rr))
+
 	if ps.Process == nil {
 		sb.WriteString("<unknown>")
 	} else {

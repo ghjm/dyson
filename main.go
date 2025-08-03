@@ -6,6 +6,8 @@ import (
 	"github.com/ghjm/dyson/pkg/dyson"
 	"github.com/spf13/cobra"
 	"os"
+	"strconv"
+	"strings"
 )
 
 //go:embed data.yml
@@ -63,13 +65,37 @@ func main() {
 
 	chainCmd := &cobra.Command{
 		Use:   "chain",
-		Short: "Calculate production chain for a given list of items",
+		Short: "Calculate production chain for a given list of items.  Give item:rate to specify a target rate.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			df, err := loadData()
 			if err != nil {
 				return err
 			}
-			ch := df.NewChain(args)
+			var reqs []string
+			rates := make(map[string]float32)
+			for _, arg := range args {
+				if strings.Contains(arg, ":") {
+					parts := strings.Split(arg, ":")
+					if len(parts) != 2 {
+						return fmt.Errorf("invalid argument: %s", arg)
+					}
+					rate, err := strconv.ParseFloat(parts[1], 32)
+					if err != nil {
+						return fmt.Errorf("invalid rate: %s", parts[1])
+					}
+					reqs = append(reqs, parts[0])
+					rates[parts[0]] = float32(rate)
+				} else {
+					reqs = append(reqs, arg)
+				}
+			}
+			ch := df.NewChain(reqs)
+			for item, rate := range rates {
+				err = ch.SetRate(item, rate)
+				if err != nil {
+					return fmt.Errorf("error setting rate: %w", err)
+				}
+			}
 			err = ch.FillChain()
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
