@@ -574,3 +574,132 @@ func TestProductionChain_StringOutput_StableOrder(t *testing.T) {
 
 	t.Logf("String output stable across %d runs", numRuns)
 }
+
+func TestProductionChain_RateCalculation_SingleConsumer(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test simple rate calculation with single consumer
+	pc := df.NewChain([]string{"Iron Ingot"})
+	err := pc.SetRate("Iron Ingot", 5.0)
+	if err != nil {
+		t.Fatalf("SetRate() failed: %v", err)
+	}
+
+	err = pc.FillChain()
+	if err != nil {
+		t.Fatalf("FillChain() failed: %v", err)
+	}
+
+	// Verify rates are calculated correctly
+	expectedRates := map[string]float32{
+		"Iron Ingot": 5.0,
+		"Iron Ore":   5.0, // Iron Ingot makes 1, consumes 1 Iron Ore
+	}
+
+	for _, step := range pc.Steps {
+		expectedRate, exists := expectedRates[step.Target]
+		if !exists {
+			continue // Skip items we don't care about
+		}
+		if step.Rate != expectedRate {
+			t.Errorf("Step %s: expected rate %.3f, got %.3f", step.Target, expectedRate, step.Rate)
+		}
+	}
+}
+
+func TestProductionChain_RateCalculation_MultipleConsumers(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test rate accumulation with multiple consumers
+	// Electric Motor needs Iron Ore directly (2) and Gear (1)
+	// Gear needs Iron Ingot (1), which needs Iron Ore (1)
+	// So Iron Ore is consumed by both Electric Motor directly and via the Gear->Iron Ingot chain
+	pc := df.NewChain([]string{"Electric Motor"})
+	err := pc.SetRate("Electric Motor", 3.0) // Want 3 Electric Motors per second
+	if err != nil {
+		t.Fatalf("SetRate() failed: %v", err)
+	}
+
+	err = pc.FillChain()
+	if err != nil {
+		t.Fatalf("FillChain() failed: %v", err)
+	}
+
+	// Verify rates are accumulated correctly from multiple consumers
+	expectedRates := map[string]float32{
+		"Electric Motor": 3.0,
+		"Gear":           3.0, // Electric Motor needs 1 Gear each, so 3/s
+		"Iron Ingot":     3.0, // Gear needs 1 Iron Ingot each, so 3/s
+		"Iron Ore":       9.0, // 6 from Electric Motor directly (3 * 2) + 3 from Iron Ingot (3 * 1)
+	}
+
+	for _, step := range pc.Steps {
+		expectedRate, exists := expectedRates[step.Target]
+		if !exists {
+			continue // Skip items we don't care about
+		}
+		if step.Rate != expectedRate {
+			t.Errorf("Step %s: expected rate %.3f, got %.3f", step.Target, expectedRate, step.Rate)
+		}
+	}
+}
+
+func TestProductionChain_RateCalculation_ComplexRecipe(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test with Circuit Board which makes 2 per run
+	pc := df.NewChain([]string{"Circuit Board"})
+	err := pc.SetRate("Circuit Board", 6.0) // Want 6 per second
+	if err != nil {
+		t.Fatalf("SetRate() failed: %v", err)
+	}
+
+	err = pc.FillChain()
+	if err != nil {
+		t.Fatalf("FillChain() failed: %v", err)
+	}
+
+	// Circuit Board makes 2 per run, consumes 2 Iron Ingot + 1 Copper Ingot
+	// For 6/s: need 3 runs/s, so need 6 Iron Ingot/s + 3 Copper Ingot/s
+	expectedRates := map[string]float32{
+		"Circuit Board": 6.0,
+		"Iron Ingot":    6.0,
+		"Copper Ingot":  3.0,
+		"Iron Ore":      6.0,
+		"Copper Ore":    3.0,
+	}
+
+	for _, step := range pc.Steps {
+		expectedRate, exists := expectedRates[step.Target]
+		if !exists {
+			continue
+		}
+		if step.Rate != expectedRate {
+			t.Errorf("Step %s: expected rate %.3f, got %.3f", step.Target, expectedRate, step.Rate)
+		}
+	}
+}
+
+func TestProductionChain_RateCalculation_NoRate(t *testing.T) {
+	df := getTestDataFile(t)
+
+	// Test that chains work without rates (backward compatibility)
+	pc := df.NewChain([]string{"Circuit Board"})
+	err := pc.FillChain()
+	if err != nil {
+		t.Fatalf("FillChain() failed: %v", err)
+	}
+
+	// All rates should be 0
+	for _, step := range pc.Steps {
+		if step.Rate != 0 {
+			t.Errorf("Step %s: expected rate 0, got %.3f", step.Target, step.Rate)
+		}
+	}
+
+	// String output should not show rates
+	str := pc.String()
+	if strings.Contains(str, "/s") {
+		t.Error("String output should not contain rates when no rates are set")
+	}
+}
