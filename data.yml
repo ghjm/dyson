@@ -962,7 +962,7 @@ processes:
       Titanium Alloy: 40
       Steel: 40
       Processor: 40
-      Strange Matter: 8
+      Particle Container: 8
     time: 15
     facility: [ assembler, replicator ]
 
