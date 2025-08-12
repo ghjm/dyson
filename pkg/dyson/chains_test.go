@@ -377,6 +377,126 @@ func TestProductionStep_String(t *testing.T) {
 	}
 }
 
+func TestProductionChain_FillChainExcluding(t *testing.T) {
+	df := getTestDataFile(t)
+
+	tests := []struct {
+		name       string
+		targets    []string
+		exclusions []string
+		wantErr    bool
+		checkSteps func(t *testing.T, steps []ProductionStep)
+	}{
+		{
+			name:       "exclude basic resource",
+			targets:    []string{"Iron Ingot"},
+			exclusions: []string{"Iron Ore"},
+			wantErr:    false,
+			checkSteps: func(t *testing.T, steps []ProductionStep) {
+				// Should have Iron Ingot step but no Iron Ore step
+				found := make(map[string]bool)
+				for _, step := range steps {
+					found[step.Target] = true
+				}
+				if !found["Iron Ingot"] {
+					t.Error("Should have Iron Ingot step")
+				}
+				if found["Iron Ore"] {
+					t.Error("Should not have Iron Ore step (excluded)")
+				}
+			},
+		},
+		{
+			name:       "exclude intermediate product",
+			targets:    []string{"Circuit Board"},
+			exclusions: []string{"Iron Ingot"},
+			wantErr:    false,
+			checkSteps: func(t *testing.T, steps []ProductionStep) {
+				// Should have Circuit Board and Copper chain, but no Iron chain
+				found := make(map[string]bool)
+				for _, step := range steps {
+					found[step.Target] = true
+				}
+				if !found["Circuit Board"] {
+					t.Error("Should have Circuit Board step")
+				}
+				if !found["Copper Ingot"] {
+					t.Error("Should have Copper Ingot step")
+				}
+				if found["Iron Ingot"] {
+					t.Error("Should not have Iron Ingot step (excluded)")
+				}
+				if found["Iron Ore"] {
+					t.Error("Should not have Iron Ore step (dependency of excluded item)")
+				}
+			},
+		},
+		{
+			name:       "exclude multiple items",
+			targets:    []string{"Circuit Board"},
+			exclusions: []string{"Iron Ore", "Copper Ore"},
+			wantErr:    false,
+			checkSteps: func(t *testing.T, steps []ProductionStep) {
+				// Should have processing steps but no mining steps
+				found := make(map[string]bool)
+				for _, step := range steps {
+					found[step.Target] = true
+				}
+				if !found["Circuit Board"] {
+					t.Error("Should have Circuit Board step")
+				}
+				if !found["Iron Ingot"] {
+					t.Error("Should have Iron Ingot step")
+				}
+				if !found["Copper Ingot"] {
+					t.Error("Should have Copper Ingot step")
+				}
+				if found["Iron Ore"] {
+					t.Error("Should not have Iron Ore step (excluded)")
+				}
+				if found["Copper Ore"] {
+					t.Error("Should not have Copper Ore step (excluded)")
+				}
+			},
+		},
+		{
+			name:       "no exclusions",
+			targets:    []string{"Iron Ingot"},
+			exclusions: []string{},
+			wantErr:    false,
+			checkSteps: func(t *testing.T, steps []ProductionStep) {
+				// Should behave like normal FillChain
+				found := make(map[string]bool)
+				for _, step := range steps {
+					found[step.Target] = true
+				}
+				if !found["Iron Ingot"] {
+					t.Error("Should have Iron Ingot step")
+				}
+				if !found["Iron Ore"] {
+					t.Error("Should have Iron Ore step")
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pc := df.NewChain(tt.targets)
+			err := pc.FillChainExcluding(tt.exclusions)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FillChainExcluding() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr && tt.checkSteps != nil {
+				tt.checkSteps(t, pc.Steps)
+			}
+		})
+	}
+}
+
 func TestProductionChain_EdgeCases(t *testing.T) {
 	df := getTestDataFile(t)
 

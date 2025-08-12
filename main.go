@@ -63,6 +63,7 @@ func main() {
 	}
 	rootCmd.AddCommand(validateCmd)
 
+	var haveItems []string
 	chainCmd := &cobra.Command{
 		Use:   "chain",
 		Short: "Calculate production chain for a given list of items.  Give item:rate to specify a target rate.",
@@ -96,7 +97,7 @@ func main() {
 					return fmt.Errorf("error setting rate: %w", err)
 				}
 			}
-			err = ch.FillChain()
+			err = ch.FillChainExcluding(haveItems)
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
 			}
@@ -104,6 +105,7 @@ func main() {
 			return nil
 		},
 	}
+	chainCmd.Flags().StringArrayVar(&haveItems, "have", []string{}, "Items you already have (excludes them from the chain)")
 	rootCmd.AddCommand(chainCmd)
 
 	makesCmd := &cobra.Command{

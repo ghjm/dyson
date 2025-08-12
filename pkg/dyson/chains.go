@@ -41,6 +41,10 @@ func (pc *ProductionChain) SetRate(item string, rate float32) error {
 }
 
 func (pc *ProductionChain) fillOneChain(n int) error {
+	return pc.fillOneChainExcluding(n, nil)
+}
+
+func (pc *ProductionChain) fillOneChainExcluding(n int, excluded map[string]struct{}) error {
 	ps := &pc.Steps[n]
 	if ps.Process != nil {
 		return fmt.Errorf("chain already filled")
@@ -58,6 +62,13 @@ func (pc *ProductionChain) fillOneChain(n int) error {
 			}
 
 			for _, con := range slices.Sorted(maps.Keys(proc.Consumes)) {
+				// Skip excluded items
+				if excluded != nil {
+					if _, isExcluded := excluded[con]; isExcluded {
+						continue
+					}
+				}
+
 				consumedAmount := float32(proc.Consumes[con])
 				requiredRate := runsPerSecond * consumedAmount
 
@@ -87,13 +98,22 @@ func (pc *ProductionChain) fillOneChain(n int) error {
 }
 
 func (pc *ProductionChain) FillChain() error {
+	return pc.FillChainExcluding(nil)
+}
+
+func (pc *ProductionChain) FillChainExcluding(exclusions []string) error {
+	excluded := make(map[string]struct{})
+	for _, ex := range exclusions {
+		excluded[ex] = struct{}{}
+	}
+
 	var complete bool
 	for !complete {
 		complete = true
 		for i, step := range pc.Steps {
 			if step.Process == nil {
 				complete = false
-				err := pc.fillOneChain(i)
+				err := pc.fillOneChainExcluding(i, excluded)
 				if err != nil {
 					return err
 				}
