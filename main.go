@@ -64,6 +64,7 @@ func main() {
 	rootCmd.AddCommand(validateCmd)
 
 	var haveItems []string
+	var factoriesMode bool
 	chainCmd := &cobra.Command{
 		Use:   "chain",
 		Short: "Calculate production chain for a given list of items.  Give item:rate to specify a target rate.",
@@ -80,12 +81,19 @@ func main() {
 					if len(parts) != 2 {
 						return fmt.Errorf("invalid argument: %s", arg)
 					}
-					rate, err := strconv.ParseFloat(parts[1], 32)
+					pRate, err := strconv.ParseFloat(parts[1], 32)
 					if err != nil {
 						return fmt.Errorf("invalid rate: %s", parts[1])
 					}
+					rate := float32(pRate)
+					if factoriesMode {
+						rate, err = df.FactoriesToItemsPerSecond(parts[0], rate)
+						if err != nil {
+							return fmt.Errorf("error calculating rate: %w", err)
+						}
+					}
 					reqs = append(reqs, parts[0])
-					rates[parts[0]] = float32(rate)
+					rates[parts[0]] = rate
 				} else {
 					reqs = append(reqs, arg)
 				}
@@ -101,11 +109,24 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("error filling chain: %w", err)
 			}
-			fmt.Printf("%s", ch.String())
+			var opts []dyson.StringOption
+			if factoriesMode {
+				opts = append(opts, dyson.WithUnitConverter(
+					func(item string, rate float32) (bool, float32, string) {
+						newRate, err := df.ItemsPerSecondToFactories(item, rate)
+						if err != nil {
+							return false, 0, ""
+						} else {
+							return true, newRate, " factories"
+						}
+					}))
+			}
+			fmt.Printf("%s", ch.StringWithOpts(opts...))
 			return nil
 		},
 	}
 	chainCmd.Flags().StringArrayVar(&haveItems, "have", []string{}, "Items you already have (excludes them from the chain)")
+	chainCmd.Flags().BoolVar(&factoriesMode, "factories", false, "Interpret rates as number of factories instead of items per second")
 	rootCmd.AddCommand(chainCmd)
 
 	makesCmd := &cobra.Command{

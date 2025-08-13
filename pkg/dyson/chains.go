@@ -18,6 +18,14 @@ type ProductionStep struct {
 	Rate    float32
 }
 
+type StringOptions struct {
+	converterFunc StringUnitConverterFunc
+}
+
+type StringOption func(*StringOptions)
+
+type StringUnitConverterFunc func(item string, rate float32) (bool, float32, string)
+
 func (df *DataFile) NewChain(reqs []string) *ProductionChain {
 	pc := &ProductionChain{
 		df: df,
@@ -189,21 +197,46 @@ func (pc *ProductionChain) GetAllProducibleExcluding(exclusions []string) error 
 }
 
 func (pc *ProductionChain) String() string {
+	return pc.StringWithOpts()
+}
+
+func (pc *ProductionChain) StringWithOpts(opts ...StringOption) string {
 	sb := strings.Builder{}
 	for _, step := range pc.Steps {
-		sb.WriteString(step.String())
+		sb.WriteString(step.StringWithOpts(opts...))
 		sb.WriteString("\n")
 	}
 	return sb.String()
 }
 
 func (ps *ProductionStep) String() string {
-	sb := strings.Builder{}
+	return ps.StringWithOpts()
+}
 
+func WithUnitConverter(conv StringUnitConverterFunc) func(options *StringOptions) {
+	return func(options *StringOptions) {
+		options.converterFunc = conv
+	}
+}
+
+func (ps *ProductionStep) StringWithOpts(opts ...StringOption) string {
+	so := StringOptions{}
+	for _, opt := range opts {
+		opt(&so)
+	}
+	sb := strings.Builder{}
 	rr := ""
 	if ps.Rate > 0 {
+		rate := ps.Rate
+		suffix := "/s"
+		if so.converterFunc != nil {
+			convert, newRate, newSuffix := so.converterFunc(ps.Target, rate)
+			if convert {
+				rate, suffix = newRate, newSuffix
+			}
+		}
 		// Format without scientific notation and remove trailing zeros
-		rr = fmt.Sprintf(" (%s/s)", strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.3f", ps.Rate), "0"), "."))
+		rr = fmt.Sprintf(" (%s%s)", strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.3f", rate), "0"), "."), suffix)
 	}
 
 	sb.WriteString(fmt.Sprintf("%s%s: ", ps.Target, rr))

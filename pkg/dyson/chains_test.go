@@ -70,7 +70,7 @@ processes:
     time: 1
     facility: [ assembler ]
     special: true
-`
+  `
 
 func getTestDataFile(t *testing.T) *DataFile {
 	df, err := LoadData([]byte(chainTestYAMLData))

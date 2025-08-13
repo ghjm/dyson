@@ -90,3 +90,55 @@ func (df *DataFile) Validate() error {
 	}
 	return nil
 }
+
+// FactoriesToItemsPerSecond converts a factory count to items per second for a given item
+func (df *DataFile) FactoriesToItemsPerSecond(item string, factories float32) (float32, error) {
+	processes := df.procsByTarget[item]
+	if len(processes) == 0 {
+		return 0, fmt.Errorf("no processes found for item: %s", item)
+	}
+
+	// Use the first non-special process
+	var selectedProcess *Process
+	for _, proc := range processes {
+		if !proc.Special {
+			selectedProcess = &proc
+			break
+		}
+	}
+	if selectedProcess == nil {
+		return 0, fmt.Errorf("no non-special processes found for item: %s", item)
+	}
+
+	// Calculate items per second from factories
+	itemsPerRun := float32(selectedProcess.Makes[item])
+	runsPerSecond := 1.0 / selectedProcess.Time
+	itemsPerSecondPerFactory := itemsPerRun * runsPerSecond
+	return factories * itemsPerSecondPerFactory, nil
+}
+
+// ItemsPerSecondToFactories converts items per second to factory count for a given item
+func (df *DataFile) ItemsPerSecondToFactories(item string, itemsPerSecond float32) (float32, error) {
+	processes := df.procsByTarget[item]
+	if len(processes) == 0 {
+		return 0, fmt.Errorf("no processes found for item: %s", item)
+	}
+
+	// Use the first non-special process
+	var selectedProcess *Process
+	for _, proc := range processes {
+		if !proc.Special {
+			selectedProcess = &proc
+			break
+		}
+	}
+	if selectedProcess == nil {
+		return 0, fmt.Errorf("no non-special processes found for item: %s", item)
+	}
+
+	// Calculate factories from items per second
+	itemsPerRun := float32(selectedProcess.Makes[item])
+	runsPerSecond := 1.0 / selectedProcess.Time
+	itemsPerSecondPerFactory := itemsPerRun * runsPerSecond
+	return itemsPerSecond / itemsPerSecondPerFactory, nil
+}
