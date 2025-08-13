@@ -1,18 +1,15 @@
 PROGRAM := dyson
 PLATFORMS := linux/amd64 linux/arm64 windows/amd64 windows/arm64 darwin/amd64 darwin/arm64
-PROGRAM_DEPS := Makefile data.yml go.mod go.sum main.go $(call go_deps,main.go)
 SHELL := /bin/bash
+
+GO_FILES := $(shell find . -name '*.go' ! -name '*_test.go' ! -name '*_gen.go')
+PROGRAM_DEPS := Makefile data.yml go.mod go.sum $(GO_FILES)
 
 # Get commit hash from git
 VERSION_FLAGS := $(shell git rev-parse HEAD)
 ifneq ($(VERSION_FLAGS),)
 	VERSION_FLAGS := -ldflags="-X 'main.gitCommit=$(VERSION_FLAGS)'"
 endif
-
-# go_deps calculates the Go dependencies required to compile a given source file
-define go_deps
-$(shell find $(shell go list -f '{{.Dir}}' -deps $(1) | grep "^$$PWD") -name '*.go' | grep -v '_test.go$$' | grep -v '_gen.go$$')
-endef
 
 # binary_path calculates the bin path for a given platform
 define binary_path
