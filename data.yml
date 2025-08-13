@@ -367,7 +367,7 @@ processes:
   - makes:
       Electric Motor: 1
     consumes:
-      Iron Ore: 2
+      Iron Ingot: 2
       Gear: 1
       Magnetic Coil: 1
     time: 2
