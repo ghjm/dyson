@@ -253,3 +253,50 @@ func (ps *ProductionStep) StringWithOpts(opts ...StringOption) string {
 	}
 	return sb.String()
 }
+
+// MermaidGraph generates a Mermaid graph representation of the production chain
+func (pc *ProductionChain) MermaidGraph() string {
+	sb := strings.Builder{}
+	sb.WriteString("graph LR\n")
+
+	// First, declare all nodes with their descriptions
+	nodesDeclared := make(map[string]bool)
+	for _, step := range pc.Steps {
+		if step.Process == nil {
+			continue
+		}
+
+		// Declare target node
+		targetEncoded := strings.ToLower(strings.ReplaceAll(step.Target, " ", "_"))
+		if !nodesDeclared[targetEncoded] {
+			sb.WriteString(fmt.Sprintf("    %s[\"%s\"]\n", targetEncoded, step.Target))
+			nodesDeclared[targetEncoded] = true
+		}
+
+		// Declare input nodes
+		for input := range step.Process.Consumes {
+			inputEncoded := strings.ToLower(strings.ReplaceAll(input, " ", "_"))
+			if !nodesDeclared[inputEncoded] {
+				sb.WriteString(fmt.Sprintf("    %s[\"%s\"]\n", inputEncoded, input))
+				nodesDeclared[inputEncoded] = true
+			}
+		}
+	}
+
+	// Then, add the arrows showing production dependencies
+	for _, step := range pc.Steps {
+		if step.Process == nil {
+			continue
+		}
+
+		targetEncoded := strings.ToLower(strings.ReplaceAll(step.Target, " ", "_"))
+
+		// Add arrows from inputs to target
+		for input := range step.Process.Consumes {
+			inputEncoded := strings.ToLower(strings.ReplaceAll(input, " ", "_"))
+			sb.WriteString(fmt.Sprintf("    %s --> %s\n", inputEncoded, targetEncoded))
+		}
+	}
+
+	return sb.String()
+}

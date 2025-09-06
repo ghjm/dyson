@@ -129,6 +129,53 @@ func main() {
 	chainCmd.Flags().BoolVar(&factoriesMode, "factories", false, "Interpret rates as number of factories instead of items per second")
 	rootCmd.AddCommand(chainCmd)
 
+	var graphHaveItems []string
+	graphCmd := &cobra.Command{
+		Use:   "graph",
+		Short: "Generate a Mermaid graph capturing the production dependencies for a given set of targets",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			df, err := loadData()
+			if err != nil {
+				return err
+			}
+			var reqs []string
+			rates := make(map[string]float32)
+			for _, arg := range args {
+				if strings.Contains(arg, ":") {
+					parts := strings.Split(arg, ":")
+					if len(parts) != 2 {
+						return fmt.Errorf("invalid argument: %s", arg)
+					}
+					pRate, err := strconv.ParseFloat(parts[1], 32)
+					if err != nil {
+						return fmt.Errorf("invalid rate: %s", parts[1])
+					}
+					rate := float32(pRate)
+					reqs = append(reqs, parts[0])
+					rates[parts[0]] = rate
+				} else {
+					reqs = append(reqs, arg)
+				}
+			}
+			ch := df.NewChain(reqs)
+			for item, rate := range rates {
+				err = ch.SetRate(item, rate)
+				if err != nil {
+					return fmt.Errorf("error setting rate: %w", err)
+				}
+			}
+			err = ch.FillChainExcluding(graphHaveItems)
+			if err != nil {
+				return fmt.Errorf("error filling chain: %w", err)
+			}
+			graph := ch.MermaidGraph()
+			fmt.Print(graph)
+			return nil
+		},
+	}
+	graphCmd.Flags().StringArrayVar(&graphHaveItems, "have", []string{}, "Items you already have (excludes them from the graph)")
+	rootCmd.AddCommand(graphCmd)
+
 	makesCmd := &cobra.Command{
 		Use:   "makes",
 		Short: "Calculate what can be produced from a given list of items",

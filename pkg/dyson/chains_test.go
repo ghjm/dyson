@@ -823,3 +823,232 @@ func TestProductionChain_RateCalculation_NoRate(t *testing.T) {
 		t.Error("String output should not contain rates when no rates are set")
 	}
 }
+
+func TestProductionChain_MermaidGraph(t *testing.T) {
+	df := getTestDataFile(t)
+
+	tests := []struct {
+		name           string
+		targets        []string
+		exclusions     []string
+		expectedNodes  []string
+		expectedArrows []string
+		shouldContain  []string
+	}{
+		{
+			name:    "simple single item",
+			targets: []string{"Iron Ingot"},
+			expectedNodes: []string{
+				`iron_ingot["Iron Ingot"]`,
+				`iron_ore["Iron Ore"]`,
+			},
+			expectedArrows: []string{
+				"iron_ore --> iron_ingot",
+			},
+			shouldContain: []string{
+				"graph LR",
+			},
+		},
+		{
+			name:    "complex item with multiple dependencies",
+			targets: []string{"Circuit Board"},
+			expectedNodes: []string{
+				`circuit_board["Circuit Board"]`,
+				`iron_ingot["Iron Ingot"]`,
+				`copper_ingot["Copper Ingot"]`,
+				`iron_ore["Iron Ore"]`,
+				`copper_ore["Copper Ore"]`,
+			},
+			expectedArrows: []string{
+				"iron_ingot --> circuit_board",
+				"copper_ingot --> circuit_board",
+				"iron_ore --> iron_ingot",
+				"copper_ore --> copper_ingot",
+			},
+		},
+		{
+			name:    "multiple targets",
+			targets: []string{"Iron Ingot", "Copper Ingot"},
+			expectedNodes: []string{
+				`iron_ingot["Iron Ingot"]`,
+				`copper_ingot["Copper Ingot"]`,
+				`iron_ore["Iron Ore"]`,
+				`copper_ore["Copper Ore"]`,
+			},
+			expectedArrows: []string{
+				"iron_ore --> iron_ingot",
+				"copper_ore --> copper_ingot",
+			},
+		},
+		{
+			name:       "with exclusions",
+			targets:    []string{"Circuit Board"},
+			exclusions: []string{"Iron Ore"},
+			expectedNodes: []string{
+				`circuit_board["Circuit Board"]`,
+				`iron_ingot["Iron Ingot"]`,
+				`copper_ingot["Copper Ingot"]`,
+				`copper_ore["Copper Ore"]`,
+			},
+			expectedArrows: []string{
+				"iron_ingot --> circuit_board",
+				"copper_ingot --> circuit_board",
+				"copper_ore --> copper_ingot",
+			},
+		},
+		{
+			name:    "item with spaces and hyphens",
+			targets: []string{"Electric Motor"},
+			expectedNodes: []string{
+				`electric_motor["Electric Motor"]`,
+				`iron_ore["Iron Ore"]`,
+				`gear["Gear"]`,
+				`iron_ingot["Iron Ingot"]`,
+			},
+			expectedArrows: []string{
+				"iron_ore --> electric_motor",
+				"gear --> electric_motor",
+				"iron_ingot --> gear",
+				"iron_ore --> iron_ingot",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pc := df.NewChain(tt.targets)
+
+			var err error
+			if len(tt.exclusions) > 0 {
+				err = pc.FillChainExcluding(tt.exclusions)
+			} else {
+				err = pc.FillChain()
+			}
+			if err != nil {
+				t.Fatalf("FillChain failed: %v", err)
+			}
+
+			graph := pc.MermaidGraph()
+
+			// Check that it starts with graph LR
+			if !strings.HasPrefix(graph, "graph LR\n") {
+				t.Error("MermaidGraph() should start with 'graph LR\\n'")
+			}
+
+			// Check for expected nodes
+			for _, expectedNode := range tt.expectedNodes {
+				if !strings.Contains(graph, expectedNode) {
+					t.Errorf("MermaidGraph() missing expected node: %s", expectedNode)
+				}
+			}
+
+			// Check for expected arrows
+			for _, expectedArrow := range tt.expectedArrows {
+				if !strings.Contains(graph, expectedArrow) {
+					t.Errorf("MermaidGraph() missing expected arrow: %s", expectedArrow)
+				}
+			}
+
+			// Check for general content requirements
+			for _, content := range tt.shouldContain {
+				if !strings.Contains(graph, content) {
+					t.Errorf("MermaidGraph() should contain: %s", content)
+				}
+			}
+
+			// Verify no duplicate node declarations
+			lines := strings.Split(graph, "\n")
+			nodeDeclarations := make(map[string]int)
+			for _, line := range lines {
+				line = strings.TrimSpace(line)
+				if strings.Contains(line, "[\"") && strings.Contains(line, "\"]") {
+					nodeDeclarations[line]++
+				}
+			}
+			for node, count := range nodeDeclarations {
+				if count > 1 {
+					t.Errorf("MermaidGraph() has duplicate node declaration: %s (appears %d times)", node, count)
+				}
+			}
+		})
+	}
+}
+
+func TestProductionChain_MermaidGraph_EmptyChain(t *testing.T) {
+	df := getTestDataFile(t)
+	pc := df.NewChain([]string{})
+
+	graph := pc.MermaidGraph()
+
+	expected := "graph LR\n"
+	if graph != expected {
+		t.Errorf("MermaidGraph() for empty chain = %q, want %q", graph, expected)
+	}
+}
+
+func TestProductionChain_MermaidGraph_UnfilledChain(t *testing.T) {
+	df := getTestDataFile(t)
+	pc := df.NewChain([]string{"Iron Ingot"})
+	// Don't call FillChain()
+
+	graph := pc.MermaidGraph()
+
+	// Should only contain the graph header since no processes are filled
+	expected := "graph LR\n"
+	if graph != expected {
+		t.Errorf("MermaidGraph() for unfilled chain = %q, want %q", graph, expected)
+	}
+}
+
+func TestProductionChain_MermaidGraph_NodeNameEncoding(t *testing.T) {
+	df := getTestDataFile(t)
+
+	tests := []struct {
+		name         string
+		itemName     string
+		expectedNode string
+	}{
+		{
+			name:         "simple name",
+			itemName:     "Gear",
+			expectedNode: "gear",
+		},
+		{
+			name:         "name with spaces",
+			itemName:     "Iron Ingot",
+			expectedNode: "iron_ingot",
+		},
+		{
+			name:         "name with spaces and mixed case",
+			itemName:     "Circuit Board",
+			expectedNode: "circuit_board",
+		},
+		{
+			name:         "name with multiple words",
+			itemName:     "Electric Motor",
+			expectedNode: "electric_motor",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pc := df.NewChain([]string{tt.itemName})
+			err := pc.FillChain()
+			if err != nil {
+				t.Fatalf("FillChain failed: %v", err)
+			}
+
+			graph := pc.MermaidGraph()
+
+			// Check that the encoded node name appears in the graph
+			if !strings.Contains(graph, tt.expectedNode+"[") {
+				t.Errorf("MermaidGraph() should contain encoded node name %q", tt.expectedNode)
+			}
+
+			// Check that the original name appears in quotes
+			if !strings.Contains(graph, `"`+tt.itemName+`"`) {
+				t.Errorf("MermaidGraph() should contain original name %q in quotes", tt.itemName)
+			}
+		})
+	}
+}
